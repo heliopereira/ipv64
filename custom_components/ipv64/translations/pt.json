@@ -10,6 +10,7 @@
       "unauthorized": "O Token de Atualização de Conta é inválido.",
       "retry_limit_exceeded": "Falha na conexão com IPv64.net após várias tentativas. Verifique sua rede.",
       "invalid_domain": "O domínio inserido tem um formato inválido ou não é permitido. Domínios permitidos: ipv64.net, ipv64.de, any64.de, eth64.de, home64.de, iot64.de, lan64.de, nas64.de, srv64.de, tcp64.de, udp64.de, vpn64.de, wan64.de, api64.de, dyndns64.de, dynipv6.de, dns64.de, root64.de, route64.de.",
+      "invalid_update_token_format": "Formato do token de atualização inválido. Cole o valor secreto do token (não o nome/rótulo).",
       "cannot_connect": "Erro de rede: Não foi possível estabelecer conexão com IPv64.net. Verifique sua conexão com a internet."
     },
     "step": {
@@ -20,9 +21,9 @@
           "apikey": "Chave de API",
           "domain": "Domínio",
           "scan_interval": "Intervalo de atualização (0-120 minutos, 0=desativado)",
-          "token": "Token de Atualização de Conta"
+          "token": "Token de Atualização de Conta (valor secreto)"
         },
-        "description": "O IPv64.net oferece serviços DynDNS e healthcheck. IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`. Ative o suporte IPv6 abaixo para também atualizar registros AAAA quando houver IPv6 disponível.",
+        "description": "O IPv64.net oferece serviços DynDNS e healthcheck. IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`. No Token de Atualização, cole o valor secreto do token do IPv64.net (não o nome/rótulo).",
         "title": "IPv64.net | Serviço Gratuito de DynDNS2 e Healthcheck"
       }
     }
@@ -33,9 +34,10 @@
         "data": {
           "api_key_economy": "Ativar modo econômico (atualiza apenas quando o IP muda, verificado por serviços públicos de checagem de IP IPv4/IPv6)",
           "enable_ipv6": "Ativar suporte a IPv6 (quando disponível)",
-          "scan_interval": "Intervalo de atualização (0-120 minutos, 0=desativado)"
+          "scan_interval": "Intervalo de atualização (0-120 minutos, 0=desativado)",
+          "token": "Token de Atualização de Conta (valor secreto)"
         },
-        "description": "Configure o intervalo de atualização, o modo econômico e o suporte a IPv6. IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`.",
+        "description": "Configure o intervalo de atualização, o modo econômico, o suporte a IPv6 e o token de atualização. Use o valor secreto do token (não o nome/rótulo). IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`.",
         "title": "Configuração do IPv64.net"
       }
     }

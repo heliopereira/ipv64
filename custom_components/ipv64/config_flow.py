@@ -47,6 +47,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # Regex for valid domain names (e.g., subdomain.ipv64.net or prefix.subdomain.home64.de)
 DOMAIN_REGEX = r"^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63})+$"
+UPDATE_TOKEN_REGEX = r"^[A-Za-z0-9]{16,128}$"
 
 
 class TokenError(Exception):
@@ -75,6 +76,10 @@ class InvalidAPIKey(HomeAssistantError):
 
 class InvalidDomain(HomeAssistantError):
     """Error to indicate the domain format is invalid."""
+
+
+class InvalidUpdateTokenFormat(HomeAssistantError):
+    """Error to indicate update token format looks invalid."""
 
 
 async def get_domains(session: aiohttp.ClientSession, headers_api: dict[str, str]) -> dict[str, Any]:
@@ -200,6 +205,10 @@ async def validate_input(hass: core.HomeAssistant, data: dict[str, Any]) -> dict
     if not re.match(DOMAIN_REGEX, data[CONF_DOMAIN]):
         _LOGGER.error("Invalid domain format: %s", data[CONF_DOMAIN])
         raise InvalidDomain("Invalid domain format")
+    # Validate update token format before API calls
+    if not re.match(UPDATE_TOKEN_REGEX, data[CONF_TOKEN]):
+        _LOGGER.error("Invalid update token format for domain %s", data[CONF_DOMAIN])
+        raise InvalidUpdateTokenFormat("Invalid update token format")
     result = await check_domain_login(hass, data)
     await validate_update_token(hass, data)
     return {"title": f"{DOMAIN} {data[CONF_DOMAIN]}", "data": result}
@@ -290,6 +299,8 @@ class IPv64ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             except InvalidDomain:
                 errors["base"] = "invalid_domain"
+            except InvalidUpdateTokenFormat:
+                errors["base"] = "invalid_update_token_format"
             except TokenError:
                 errors["base"] = "domain_not_found"
             except APIKeyError:
@@ -344,9 +355,68 @@ class IPv64OptionsFlowHandler(config_entries.OptionsFlowWithConfigEntry):
                         unit_of_measurement="minutes",
                     )
                 ),
+                vol.Required(
+                    CONF_TOKEN,
+                    default=self.config_entry.data.get(CONF_TOKEN, ""),
+                ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD, multiline=False)),
             }
         )
         if user_input is not None:
+            token = user_input[CONF_TOKEN]
+            if not re.match(UPDATE_TOKEN_REGEX, token):
+                return self.async_show_form(
+                    step_id="init",
+                    data_schema=data_schema,
+                    errors={"base": "invalid_update_token_format"},
+                    last_step=True,
+                    description_placeholders={
+                        "ipv4": ip_info["ipv4"],
+                        "ipv6": ip_info["ipv6"],
+                        "ipv6_supported": ip_info["ipv6_supported"],
+                    },
+                )
+
+            try:
+                validation_data = {
+                    CONF_DOMAIN: self.config_entry.data[CONF_DOMAIN],
+                    CONF_TOKEN: token,
+                    CONF_API_KEY: self.config_entry.data[CONF_API_KEY],
+                }
+                await validate_update_token(self.hass, validation_data)
+            except UpdateTokenError:
+                return self.async_show_form(
+                    step_id="init",
+                    data_schema=data_schema,
+                    errors={"base": "unauthorized"},
+                    last_step=True,
+                    description_placeholders={
+                        "ipv4": ip_info["ipv4"],
+                        "ipv6": ip_info["ipv6"],
+                        "ipv6_supported": ip_info["ipv6_supported"],
+                    },
+                )
+            except CannotConnect:
+                return self.async_show_form(
+                    step_id="init",
+                    data_schema=data_schema,
+                    errors={"base": "cannot_connect"},
+                    last_step=True,
+                    description_placeholders={
+                        "ipv4": ip_info["ipv4"],
+                        "ipv6": ip_info["ipv6"],
+                        "ipv6_supported": ip_info["ipv6_supported"],
+                    },
+                )
+
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data={
+                    **self.config_entry.data,
+                    CONF_TOKEN: token,
+                },
+            )
+
+            user_input = {k: v for k, v in user_input.items() if k != CONF_TOKEN}
             return self.async_create_entry(data=user_input)
 
         return self.async_show_form(
