@@ -174,11 +174,11 @@ async def check_domain_login(hass: core.HomeAssistant, data: dict[str, Any]) -> 
 async def validate_update_token(hass: core.HomeAssistant, data: dict[str, Any]) -> None:
     """Validate the account update token against DynDNS updater endpoint."""
     session: aiohttp.ClientSession = async_get_clientsession(hass)
-    headers_token = {"Authorization": f"Bearer {data[CONF_TOKEN]}"}
-    params = {"domain": data[CONF_DOMAIN]}
+    token = data[CONF_TOKEN]
+    params = {"domain": data[CONF_DOMAIN], "key": token}
 
     try:
-        async with session.get(UPDATE_URL, params=params, headers=headers_token, timeout=TIMEOUT) as resp:
+        async with session.get(UPDATE_URL, params=params, timeout=TIMEOUT) as resp:
             resp.raise_for_status()
             result = await resp.json()
             _LOGGER.debug("Update token validation response for %s: %s", data[CONF_DOMAIN], result)

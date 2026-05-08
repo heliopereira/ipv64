@@ -359,8 +359,10 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
             ip_is_changed = True
 
         if ip_is_changed:
-            headers_token = {"Authorization": f"Bearer {self.config_entry.data.get(CONF_TOKEN, '')}"}
+            token = self.config_entry.data.get(CONF_TOKEN, "")
             update_params: dict[str, str] = {"domain": self.config_entry.data.get(CONF_DOMAIN, "")}
+            if token:
+                update_params["key"] = token
             ip_v4 = self.data.get("ip_v4")
             ip_v6 = self.data.get("ip_v6")
             ipv6_enabled = self.config_entry.options.get(CONF_ENABLE_IPV6, True)
@@ -382,7 +384,6 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
                     async with session.get(
                         UPDATE_URL,
                         params=update_params,
-                        headers=headers_token,
                         timeout=TIMEOUT,
                     ) as resp:
                         resp.raise_for_status()
