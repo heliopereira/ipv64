@@ -9,7 +9,7 @@ body:
   - type: textarea
     attributes:
       label: "What version of Integration has the issue?"
-      description: "last release is [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Ludy87/ipv64?style=for-the-badge&logo=appveyor)](https://github.com/Ludy87/ipv64/releases)"
+      description: "last release is [![GitHub release (latest by date)](https://img.shields.io/github/v/release/heliopereira/ipv64?style=for-the-badge&logo=appveyor)](https://github.com/heliopereira/ipv64/releases)"
     validations:
       required: true
   - type: textarea
@@ -49,7 +49,7 @@ body:
   - type: textarea
     attributes:
       label: "Debug logs"
-      description: "To enable debug logs check this https://github.com/Ludy87/ipv64#debug"
+      description: "To enable debug logs check this https://github.com/heliopereira/ipv64#debug"
       render: text
     validations:
       required: true

@@ -24,5 +24,5 @@ Thank you for taking the time to contribute!
 
 ## Questions
 
-- Open an [issue](https://github.com/Ludy87/ipv64/issues) to report bugs or propose features.
-- Start a [discussion](https://github.com/Ludy87/ipv64/discussions) if you have questions or need help.
+- Open an [issue](https://github.com/heliopereira/ipv64/issues) to report bugs or propose features.
+- Start a [discussion](https://github.com/heliopereira/ipv64/discussions) if you have questions or need help.

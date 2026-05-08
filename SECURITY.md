@@ -34,4 +34,4 @@ If you discover a security vulnerability in this project, please do the followin
 
 ## Security Updates
 
-Stay updated on security fixes by watching this repository and checking the [Releases](https://github.com/Ludy87/ipv64/releases) page.
+Stay updated on security fixes by watching this repository and checking the [Releases](https://github.com/heliopereira/ipv64/releases) page.

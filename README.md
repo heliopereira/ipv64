@@ -1,26 +1,25 @@
 # [IPv64.net](https://ipv64.net/account?p=fK4RZo) | Free DynDNS2 & Healthcheck Service | Integration for Home-Assistant
 
-> **Note**: This project is a fork of [Ludy87/ipv64](https://github.com/Ludy87/ipv64) with enhanced IPv6 support for Economy Mode.
+> **Note**: This project is a fork of [Ludy87/ipv64](https://github.com/Ludy87/ipv64), maintained in this repository with independent improvements.
 
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://img.shields.io/badge/My-HACS:%20REPOSITORY-000000.svg?&style=for-the-badge&logo=home-assistant&logoColor=white&color=049cdb)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Ludy87&repository=ipv64&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://img.shields.io/badge/My-HACS:%20REPOSITORY-000000.svg?&style=for-the-badge&logo=home-assistant&logoColor=white&color=049cdb)](https://my.home-assistant.io/redirect/hacs_repository/?owner=heliopereira&repository=ipv64&category=integration)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://github.com/hacs/integration)
-![Validate with hassfest and HACS](https://img.shields.io/github/actions/workflow/status/Ludy87/ipv64/hassfest.yaml?label=Validate%20with%20hassfest%20and%20hacs&style=for-the-badge&logo=home-assistant&logoColor=white)\
-[![GitHub license](https://img.shields.io/github/license/Ludy87/ipv64?label=📜%20License&style=for-the-badge&logo=informational&logoColor=white)](LICENSE)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Ludy87/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/Ludy87/ipv64/releases)
-![GitHub Release Date](https://img.shields.io/github/release-date/Ludy87/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)
-[![GitHub stars](https://img.shields.io/github/stars/Ludy87/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/Ludy87/ipv64/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/Ludy87/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/Ludy87/ipv64/issues)
-![Github All Releases](https://img.shields.io/github/downloads/Ludy87/ipv64/total.svg?style=for-the-badge&logo=GitHub&logoColor=white)\
+![Validate with hassfest and HACS](https://img.shields.io/github/actions/workflow/status/heliopereira/ipv64/hassfest.yaml?label=Validate%20with%20hassfest%20and%20hacs&style=for-the-badge&logo=home-assistant&logoColor=white)\
+[![GitHub license](https://img.shields.io/github/license/heliopereira/ipv64?label=📜%20License&style=for-the-badge&logo=informational&logoColor=white)](LICENSE)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/heliopereira/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/heliopereira/ipv64/releases)
+![GitHub Release Date](https://img.shields.io/github/release-date/heliopereira/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)
+[![GitHub stars](https://img.shields.io/github/stars/heliopereira/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/heliopereira/ipv64/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/heliopereira/ipv64?style=for-the-badge&logo=GitHub&logoColor=white)](https://github.com/heliopereira/ipv64/issues)
+![Github All Releases](https://img.shields.io/github/downloads/heliopereira/ipv64/total.svg?style=for-the-badge&logo=GitHub&logoColor=white)\
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge&logoColor=white)\
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Ludy87/ipv64/main.svg?style=for-the-badge&logoColor=white)](https://results.pre-commit.ci/latest/github/Ludy87/ipv64/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/heliopereira/ipv64/main.svg?style=for-the-badge&logoColor=white)](https://results.pre-commit.ci/latest/github/heliopereira/ipv64/main)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9869/badge)](https://www.bestpractices.dev/projects/9869)\
-[![✨ Wishlist from Amazon ✨](https://img.shields.io/static/v1.svg?label=✨%20Wishlist%20from%20Amazon%20✨&message=📖&color=green&logo=amazon&style=for-the-badge&logoColor=white)](https://smile.amazon.de/registry/wishlist/2MX8QK8VE9MV1)
-[![Buy me a coffee](https://img.shields.io/static/v1.svg?label=Buy%20me%20a%20coffee&message=donate&style=for-the-badge&color=black&logo=buy%20me%20a%20coffee&logoColor=white&labelColor=orange)](https://www.buymeacoffee.com/ludy87)
+[![Support on Ko-fi](https://img.shields.io/static/v1.svg?label=Support%20on%20Ko-fi&message=donate&style=for-the-badge&color=ff5f5f&logo=ko-fi&logoColor=white)](https://ko-fi.com/heliopereira)
 
 ---
 
-[![IPv64.net](https://github.com/Ludy87/ipv64/blob/main/images/ipv64_logo.png?raw=true)](https://ipv64.net/account?p=fK4RZo)
+[![IPv64.net](https://github.com/heliopereira/ipv64/blob/main/images/ipv64_logo.png?raw=true)](https://ipv64.net/account?p=fK4RZo)
 
 ## Overview
 
@@ -61,7 +60,7 @@ To use this integration, you need:
 
 ### Option 2: Manual Installation
 
-1. Download the [latest release](https://github.com/Ludy87/ipv64/releases) of the IPv64 integration.
+1. Download the [latest release](https://github.com/heliopereira/ipv64/releases) of the IPv64 integration.
 2. Copy the `ipv64` folder and its contents to your Home Assistant `custom_components` directory (typically located at `/config/custom_components/`).
    - For **Hass.io** users, use SAMBA to copy the folder.
    - For **Home Assistant Supervised**, the folder may be at `/usr/share/hassio/homeassistant`.
@@ -133,21 +132,19 @@ logger:
 
 ## Support
 
-- **Documentation**: [GitHub Repository](https://github.com/Ludy87/ipv64)
-- **Issue Tracker**: [GitHub Issues](https://github.com/Ludy87/ipv64/issues)
-- **Community**: Join the [Discord server](https://discord.gg/rpicloud)
-- **Tutorials**: Check out the [YouTube channel](https://youtube.com/c/RaspberryPiCloud)
-- **Blog**: Visit [schroederdennis.de](https://schroederdennis.de/d)
-- **Twitter**: Follow [@dennis_schroed](https://twitter.com/dennis_schroed)
+- **Documentation**: [GitHub Repository](https://github.com/heliopereira/ipv64)
+- **Issue Tracker**: [GitHub Issues](https://github.com/heliopereira/ipv64/issues)
+- **Community**: Open a discussion in this repository.
+- **Tutorials**: Share or request tutorials via GitHub Discussions.
+- **Social**: Follow [@heliopereira](https://github.com/heliopereira).
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please submit issues or pull requests to the [GitHub repository](https://github.com/Ludy87/ipv64).
+Contributions are welcome! Please submit issues or pull requests to the [GitHub repository](https://github.com/heliopereira/ipv64).
 
 If you find this integration helpful, consider supporting the project:
 
-- [Buy me a coffee](https://www.buymeacoffee.com/ludy87)
-- [Amazon Wishlist](https://smile.amazon.de/registry/wishlist/2MX8QK8VE9MV1)
-- [Ipv64.net](https://ipv64.net/account?p=fK4RZo)
+- [Support on Ko-fi](https://ko-fi.com/heliopereira)
+- [IPv64.net](https://ipv64.net/account?p=fK4RZo)

@@ -7,10 +7,11 @@ from typing import Any
 
 from homeassistant.components.sensor import RestoreSensor, SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DOMAIN, CONF_IP_ADDRESS, CONF_TYPE
+from homeassistant.const import CONF_DOMAIN, CONF_IP_ADDRESS, CONF_TYPE, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -258,6 +259,7 @@ async def async_setup_entry(
     """Set up the IPv64 sensors from the config entry."""
     coordinator: IPv64DataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
     entities: list[SensorEntity] = []
+    entity_registry = er.async_get(hass)
 
     if not coordinator.data.get("subdomains"):
         _LOGGER.warning("No subdomains available for %s, skipping domain sensors", config_entry.entry_id)
@@ -274,6 +276,15 @@ async def async_setup_entry(
                 domain_types[domain].add(record_type)
 
         for domain, record_types in domain_types.items():
+            legacy_unique_id = f"{DOMAIN}_{domain}_ip"
+            legacy_entity_id = entity_registry.async_get_entity_id(
+                Platform.SENSOR,
+                DOMAIN,
+                legacy_unique_id,
+            )
+            if legacy_entity_id:
+                entity_registry.async_remove(legacy_entity_id)
+
             if "A" in record_types:
                 entities.append(IPv64DomainSensor(coordinator, domain, "A"))
             if "AAAA" in record_types:
