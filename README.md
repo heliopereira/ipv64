@@ -1,5 +1,8 @@
 # [IPv64.net](https://ipv64.net/account?p=fK4RZo) | Free DynDNS2 & Healthcheck Service | Integration for Home-Assistant
 
+> **Note**: This project is a fork of [Ludy87/ipv64](https://github.com/Ludy87/ipv64) with enhanced IPv6 support for Economy Mode.
+
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://img.shields.io/badge/My-HACS:%20REPOSITORY-000000.svg?&style=for-the-badge&logo=home-assistant&logoColor=white&color=049cdb)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Ludy87&repository=ipv64&category=integration)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://github.com/hacs/integration)
 ![Validate with hassfest and HACS](https://img.shields.io/github/actions/workflow/status/Ludy87/ipv64/hassfest.yaml?label=Validate%20with%20hassfest%20and%20hacs&style=for-the-badge&logo=home-assistant&logoColor=white)\

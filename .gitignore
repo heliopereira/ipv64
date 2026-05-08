@@ -138,3 +138,4 @@ dmypy.json
 package-lock.json
 
 !requirements*.txt
+/.vs
