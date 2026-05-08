@@ -10,7 +10,15 @@ from homeassistant.const import CONF_DOMAIN, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 
-from .const import CONF_API_ECONOMY, CONF_API_KEY, DOMAIN, SERVICE_ADD_DOMAIN, SERVICE_DELETE_DOMAIN, SERVICE_REFRESH
+from .const import (
+    CONF_API_ECONOMY,
+    CONF_API_KEY,
+    CONF_ENABLE_IPV6,
+    DOMAIN,
+    SERVICE_ADD_DOMAIN,
+    SERVICE_DELETE_DOMAIN,
+    SERVICE_REFRESH,
+)
 from .coordinator import IPv64DataUpdateCoordinator, add_domain, delete_domain
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -34,8 +42,10 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: config_entries.
         new_options = {**config_entry.options}
         if CONF_API_ECONOMY not in new_options:
             new_options[CONF_API_ECONOMY] = True
-            hass.config_entries.async_update_entry(config_entry, options=new_options)
-            _LOGGER.info("Migrated config entry %s to set CONF_API_ECONOMY=True", config_entry.entry_id)
+        if CONF_ENABLE_IPV6 not in new_options:
+            new_options[CONF_ENABLE_IPV6] = True
+        hass.config_entries.async_update_entry(config_entry, options=new_options)
+        _LOGGER.info("Migrated config entry %s options: economy/ipv6 defaults applied", config_entry.entry_id)
     return True
 
 

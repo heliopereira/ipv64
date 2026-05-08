@@ -274,12 +274,11 @@ async def async_setup_entry(
                 domain_types[domain].add(record_type)
 
         for domain, record_types in domain_types.items():
+            entities.append(IPv64DomainSensor(coordinator, domain))
             if "A" in record_types:
                 entities.append(IPv64DomainSensor(coordinator, domain, "A"))
             if "AAAA" in record_types:
                 entities.append(IPv64DomainSensor(coordinator, domain, "AAAA"))
-            if not record_types:
-                entities.append(IPv64DomainSensor(coordinator, domain))
 
         entities.append(IPv64LastUpdateSensor(coordinator))
 

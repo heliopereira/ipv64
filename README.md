@@ -74,10 +74,12 @@ To use this integration, you need:
 1. In Home Assistant, navigate to **Settings > Devices & Services > Add Integration** (+ button).
 2. Search for **IPv64** and select it.
 3. Enter your **API Key**, **Account Update Token**, and **Domain** (e.g., [`yourname.ipv64.net`](https://ipv64.net/account?p=fK4RZo)).
-4. Configure optional settings:
-   - **Economy Mode**: Enable to update the IP only when it changes (checked via `https://checkip.amazonaws.com/`), saving API tokens.
-   - **Update Interval**: Set the polling interval (0–120 minutes; default: 23 minutes). Set to 0 to disable automatic updates.
-5. Submit the configuration. The integration will appear as a card on the **Devices & Services** page.
+4. During setup, the integration displays detected public **IPv4** and **IPv6** addresses and indicates whether IPv6 support is available.
+5. Configure optional settings:
+    - **Economy Mode**: Enable to update the IP only when it changes (checked via public IPv4/IPv6 IP-check services), saving API tokens.
+    - **IPv6 Support**: Enable or disable IPv6 update support. When enabled and IPv6 is available, the integration updates AAAA records using `ip6` in the updater call.
+    - **Update Interval**: Set the polling interval (0–120 minutes; default: 23 minutes). Set to 0 to disable automatic updates.
+6. Submit the configuration. The integration will appear as a card on the **Devices & Services** page.
 
 ---
 

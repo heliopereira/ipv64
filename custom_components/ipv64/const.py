@@ -20,6 +20,7 @@ from homeassistant.helpers.selector import (
 
 CONF_API_KEY: Final = "apikey"
 CONF_API_ECONOMY: Final = "api_key_economy"
+CONF_ENABLE_IPV6: Final = "enable_ipv6"
 CONF_DAILY_UPDATE_LIMIT: Final = "daily_update_limit"
 CONF_DYNDNS_UPDATES: Final = "dyndns_updates"
 CONF_REMAINING_UPDATES: Final = "remaining_updates"
@@ -34,6 +35,7 @@ DATA_SCHEMA: Final = {
     vol.Required(CONF_TOKEN): TextSelector(TextSelectorConfig(type=TextSelectorType.TEXT, multiline=False)),
     vol.Required(CONF_API_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.TEXT, multiline=False)),
     vol.Required(CONF_API_ECONOMY, default=True): BooleanSelector(BooleanSelectorConfig()),
+    vol.Required(CONF_ENABLE_IPV6, default=True): BooleanSelector(BooleanSelectorConfig()),
     vol.Required(CONF_SCAN_INTERVAL, default=DEFAULT_INTERVAL): NumberSelector(
         NumberSelectorConfig(
             mode=NumberSelectorMode.SLIDER,

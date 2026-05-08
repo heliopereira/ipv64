@@ -16,12 +16,13 @@
       "user": {
         "data": {
           "api_key_economy": "Ativar modo econômico (atualiza apenas quando o IP muda, verificado por serviços públicos de checagem de IP IPv4/IPv6)",
+          "enable_ipv6": "Ativar suporte a IPv6 (quando disponível)",
           "apikey": "Chave de API",
           "domain": "Domínio",
           "scan_interval": "Intervalo de atualização (0-120 minutos, 0=desativado)",
           "token": "Token de Atualização de Conta"
         },
-        "description": "O IPv64.net oferece serviços DynDNS e de verificação de integridade, permitindo gerenciar domínios e manter dispositivos acessíveis apesar de IPs dinâmicos. Insira sua chave de API e Token de Atualização de Conta para configurar a integração.",
+        "description": "O IPv64.net oferece serviços DynDNS e healthcheck. IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`. Ative o suporte IPv6 abaixo para também atualizar registros AAAA quando houver IPv6 disponível.",
         "title": "IPv64.net | Serviço Gratuito de DynDNS2 e Healthcheck"
       }
     }
@@ -31,9 +32,10 @@
       "init": {
         "data": {
           "api_key_economy": "Ativar modo econômico (atualiza apenas quando o IP muda, verificado por serviços públicos de checagem de IP IPv4/IPv6)",
+          "enable_ipv6": "Ativar suporte a IPv6 (quando disponível)",
           "scan_interval": "Intervalo de atualização (0-120 minutos, 0=desativado)"
         },
-        "description": "Configure o intervalo de atualização e o modo econômico. Com uma conta gratuita, você tem 64 atualizações por dia. O intervalo recomendado é de 23 minutos (24 horas ÷ 64 atualizações ≈ 22,5 minutos).",
+        "description": "Configure o intervalo de atualização, o modo econômico e o suporte a IPv6. IPs públicos detectados: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Suporte IPv6 disponível: `{ipv6_supported}`.",
         "title": "Configuração do IPv64.net"
       }
     }

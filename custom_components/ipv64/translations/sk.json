@@ -16,12 +16,13 @@
       "user": {
         "data": {
           "api_key_economy": "Povoliť ekonomický režim (aktualizácie iba pri zmene IP, overené cez verejné IPv4/IPv6 služby kontroly IP)",
+          "enable_ipv6": "Povoliť podporu IPv6 (ak je dostupná)",
           "apikey": "Kľúč API",
           "domain": "Doména",
           "scan_interval": "Interval aktualizácie (0–120 minút, 0=vypnuté)",
           "token": "Token aktualizácie účtu"
         },
-        "description": "IPv64.net poskytuje služby DynDNS a zdravotné kontroly, ktoré umožňujú spravovať domény a udržiavať zariadenia dostupné aj pri dynamických IP adresách. Zadajte kľúč API a Token aktualizácie účtu na konfiguráciu integrácie.",
+        "description": "IPv64.net poskytuje služby DynDNS a healthcheck. Zistené verejné IP: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Dostupnosť podpory IPv6: `{ipv6_supported}`. Nižšie zapnite podporu IPv6, aby sa pri dostupnom IPv6 aktualizovali aj AAAA záznamy.",
         "title": "IPv64.net | Bezplatná služba DynDNS2 a Healthcheck"
       }
     }
@@ -31,9 +32,10 @@
       "init": {
         "data": {
           "api_key_economy": "Povoliť ekonomický režim (aktualizácie iba pri zmene IP, overené cez verejné IPv4/IPv6 služby kontroly IP)",
+          "enable_ipv6": "Povoliť podporu IPv6 (ak je dostupná)",
           "scan_interval": "Interval aktualizácie (0–120 minút, 0=vypnuté)"
         },
-        "description": "Nakonfigurujte interval aktualizácie a ekonomický režim. S bezplatným účtom máte k dispozícii 64 aktualizácií denne. Odporúčaný interval je 23 minút (24 hodín ÷ 64 aktualizácií ≈ 22,5 minúty).",
+        "description": "Nakonfigurujte interval aktualizácie, ekonomický režim a podporu IPv6. Zistené verejné IP: IPv4 `{ipv4}` | IPv6 `{ipv6}`. Dostupnosť podpory IPv6: `{ipv6_supported}`.",
         "title": "Konfigurácia IPv64.net"
       }
     }
