@@ -40,6 +40,7 @@ from .const import (
     GET_ACCOUNT_INFO_URL,
     GET_DOMAIN_URL,
     TIMEOUT,
+    UPDATE_URL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,6 +55,10 @@ class TokenError(Exception):
 
 class APIKeyError(Exception):
     """Exception for invalid API key."""
+
+
+class UpdateTokenError(Exception):
+    """Exception for invalid update token."""
 
 
 class CannotConnect(HomeAssistantError):
@@ -166,6 +171,29 @@ async def check_domain_login(hass: core.HomeAssistant, data: dict[str, Any]) -> 
     return result
 
 
+async def validate_update_token(hass: core.HomeAssistant, data: dict[str, Any]) -> None:
+    """Validate the account update token against DynDNS updater endpoint."""
+    session: aiohttp.ClientSession = async_get_clientsession(hass)
+    headers_token = {"Authorization": f"Bearer {data[CONF_TOKEN]}"}
+    params = {"domain": data[CONF_DOMAIN]}
+
+    try:
+        async with session.get(UPDATE_URL, params=params, headers=headers_token, timeout=TIMEOUT) as resp:
+            resp.raise_for_status()
+            result = await resp.json()
+            _LOGGER.debug("Update token validation response for %s: %s", data[CONF_DOMAIN], result)
+    except aiohttp.ClientResponseError as error:
+        _LOGGER.error("Update token validation failed: %s | Status: %d", error.message, error.status)
+        if error.status == 401:
+            raise UpdateTokenError("Invalid update token") from error
+        if error.status == 429:
+            raise CannotConnect("Rate limit exceeded: Maximum 3 updater requests per 10 seconds") from error
+        raise CannotConnect(f"Updater API error: {error.message}") from error
+    except (TimeoutError, aiohttp.ClientError) as error:
+        _LOGGER.error("Network error during update token validation: %s", error)
+        raise CannotConnect(f"Network error: {error}") from error
+
+
 async def validate_input(hass: core.HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input for domain login."""
     # Validate domain format
@@ -173,6 +201,7 @@ async def validate_input(hass: core.HomeAssistant, data: dict[str, Any]) -> dict
         _LOGGER.error("Invalid domain format: %s", data[CONF_DOMAIN])
         raise InvalidDomain("Invalid domain format")
     result = await check_domain_login(hass, data)
+    await validate_update_token(hass, data)
     return {"title": f"{DOMAIN} {data[CONF_DOMAIN]}", "data": result}
 
 
@@ -265,6 +294,8 @@ class IPv64ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "domain_not_found"
             except APIKeyError:
                 errors["base"] = "invalid_api_key"
+            except UpdateTokenError:
+                errors["base"] = "unauthorized"
             except CannotConnect:
                 errors["base"] = "cannot_connect"
             except Exception:
