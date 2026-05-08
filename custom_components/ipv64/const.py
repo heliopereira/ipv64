@@ -55,7 +55,8 @@ UPDATE_URL: Final = "https://ipv64.net/nic/update"
 # API_URL: Final = "http://192.168.0.220:1080/api.php"  # Local test
 API_URL: Final = "https://ipv64.net/api.php"  # Production
 
-CHECKIP_URL: Final = "https://checkip.amazonaws.com/"
+CHECKIP_V4_URL: Final = "https://checkip.amazonaws.com/"
+CHECKIP_V6_URL: Final = "https://api64.ipify.org"
 
 GET_DOMAIN_URL: Final = f"{API_URL}?get_domains"
 GET_ACCOUNT_INFO_URL: Final = f"{API_URL}?get_account_info"

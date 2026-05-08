@@ -21,7 +21,8 @@ from .config_flow import APIKeyError, get_account_info
 from .const import (
     ALLOWED_DOMAINS,
     API_URL,
-    CHECKIP_URL,
+    CHECKIP_V4_URL,
+    CHECKIP_V6_URL,
     CONF_API_ECONOMY,
     CONF_API_KEY,
     CONF_DAILY_UPDATE_LIMIT,
@@ -70,6 +71,10 @@ async def get_domain(session: aiohttp.ClientSession, headers: dict[str, str], da
                         if domain_name == config_domain:
                             domain_found = True
                             data[CONF_IP_ADDRESS] = record["content"]  # Set IP address for config domain
+                            if record.get("type") == "A":
+                                data["ip_v4"] = record["content"]
+                            elif record.get("type") == "AAAA":
+                                data["ip_v6"] = record["content"]
                         sub_domains_list.append(
                             {
                                 CONF_DOMAIN: domain_name,
@@ -458,79 +463,42 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
         return self.data
 
     async def check_ip_equal(self, session: aiohttp.ClientSession) -> bool:
-        """Check if the IP has changed."""
+        """Check if the IP has changed (both IPv4 and IPv6)."""
         _LOGGER.debug("Checking IP in economy mode for %s", self.config_entry.data.get(CONF_DOMAIN))
         config_domain = self.config_entry.data.get(CONF_DOMAIN)
-        stored_ip = self.data.get(CONF_IP_ADDRESS, "unknown")
-        if stored_ip == "unknown":
-            _LOGGER.warning("No stored IP found for domain %s, fetching from subdomains", config_domain)
-            for subdomain in self.data.get("subdomains", []):
-                if subdomain.get("domain") == config_domain:
-                    stored_ip = subdomain.get("ip_address", "unknown")
-                    self.data[CONF_IP_ADDRESS] = stored_ip  # Update self.data
-                    break
-            if stored_ip == "unknown":
-                _LOGGER.error("No IP address found for domain %s in subdomains", config_domain)
-                return True  # Trigger update if no stored IP
+        
+        stored_v4 = self.data.get("ip_v4", "unknown")
+        stored_v6 = self.data.get("ip_v6", "unknown")
 
-        for attempt in range(RETRY_ATTEMPTS):
-            try:
-                async with session.get(CHECKIP_URL, timeout=TIMEOUT) as request:
-                    request.raise_for_status()
-                    current_ip = (await request.text()).strip()
-                    _LOGGER.debug("Current IP for %s: %s", config_domain, current_ip)
-                    _LOGGER.debug("Stored IP for %s: %s", config_domain, stored_ip)
-                    ip_changed = current_ip != stored_ip
-                    _LOGGER.debug(
-                        "IP comparison for %s: stored=%s, current=%s, changed=%s",
-                        config_domain,
-                        stored_ip,
-                        current_ip,
-                        ip_changed,
-                    )
-                    if ip_changed:
-                        self.data[CONF_IP_ADDRESS] = current_ip  # Update stored IP
-                    async_dismiss(
-                        self.hass,
-                        notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_error",
-                    )
-                    async_dismiss(
-                        self.hass,
-                        notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_network_error",
-                    )
-                    return ip_changed
-            except (aiohttp.ClientResponseError, aiohttp.ClientConnectionError) as error:
-                if attempt == RETRY_ATTEMPTS - 1:
-                    _LOGGER.error(
-                        "Failed to check IP for %s after %d attempts: %s",
-                        config_domain,
-                        RETRY_ATTEMPTS,
-                        error,
-                    )
-                    async_create(
-                        self.hass,
-                        f"IPv64.net: Error while checking IP address for {config_domain}: {error}",
-                        title="IPv64.net IP Check Error",
-                        notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_error",
-                    )
-                    return False
-                _LOGGER.warning("IP check failed, retrying (%d/%d): %s", attempt + 1, RETRY_ATTEMPTS, error)
-                await asyncio.sleep(RETRY_DELAY)
-            except (TimeoutError, aiohttp.ClientError) as error:
-                if attempt == RETRY_ATTEMPTS - 1:
-                    _LOGGER.error(
-                        "Failed to check IP for %s after %d attempts: %s",
-                        config_domain,
-                        RETRY_ATTEMPTS,
-                        error,
-                    )
-                    async_create(
-                        self.hass,
-                        f"IPv64.net: Network error while checking IP address for {config_domain}: {error}",
-                        title="IPv64.net IP Check Error",
-                        notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_network_error",
-                    )
-                    return False
-                _LOGGER.warning("IP check failed, retrying (%d/%d): %s", attempt + 1, RETRY_ATTEMPTS, error)
-                await asyncio.sleep(RETRY_DELAY)
-        return False
+        if stored_v4 == "unknown" and stored_v6 == "unknown":
+            _LOGGER.warning("No stored IPv4 or IPv6 found for domain %s, triggering update", config_domain)
+            return True
+
+        ip_changed = False
+
+        # Check IPv4
+        try:
+            async with session.get(CHECKIP_V4_URL, timeout=TIMEOUT) as resp:
+                resp.raise_for_status()
+                current_v4 = (await resp.text()).strip()
+                if current_v4 != stored_v4:
+                    _LOGGER.debug("IPv4 changed for %s: %s -> %s", config_domain, stored_v4, current_v4)
+                    self.data["ip_v4"] = current_v4
+                    ip_changed = True
+            async_dismiss(self.hass, notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_error")
+        except (aiohttp.ClientError, TimeoutError) as err:
+            _LOGGER.warning("Failed to check IPv4 for %s: %s", config_domain, err)
+
+        # Check IPv6
+        try:
+            async with session.get(CHECKIP_V6_URL, timeout=TIMEOUT) as resp:
+                resp.raise_for_status()
+                current_v6 = (await resp.text()).strip()
+                if current_v6 != stored_v6:
+                    _LOGGER.debug("IPv6 changed for %s: %s -> %s", config_domain, stored_v6, current_v6)
+                    self.data["ip_v6"] = current_v6
+                    ip_changed = True
+        except (aiohttp.ClientError, TimeoutError) as err:
+            _LOGGER.debug("IPv6 check not available or failed for %s: %s", config_domain, err)
+
+        return ip_changed
