@@ -2,7 +2,6 @@
 
 > **Note**: This project is a fork of [Ludy87/ipv64](https://github.com/Ludy87/ipv64), maintained in this repository with independent improvements.
 
-
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://img.shields.io/badge/My-HACS:%20REPOSITORY-000000.svg?&style=for-the-badge&logo=home-assistant&logoColor=white&color=049cdb)](https://my.home-assistant.io/redirect/hacs_repository/?owner=heliopereira&repository=ipv64&category=integration)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://github.com/hacs/integration)
 ![Validate with hassfest and HACS](https://img.shields.io/github/actions/workflow/status/heliopereira/ipv64/hassfest.yaml?label=Validate%20with%20hassfest%20and%20hacs&style=for-the-badge&logo=home-assistant&logoColor=white)\
@@ -75,9 +74,9 @@ To use this integration, you need:
 3. Enter your **API Key**, **Account Update Token**, and **Domain** (e.g., [`yourname.ipv64.net`](https://ipv64.net/account?p=fK4RZo)).
 4. During setup, the integration displays detected public **IPv4** and **IPv6** addresses and indicates whether IPv6 support is available.
 5. Configure optional settings:
-    - **Economy Mode**: Enable to update the IP only when it changes (checked via public IPv4/IPv6 IP-check services), saving API tokens.
-    - **IPv6 Support**: Enable or disable IPv6 update support. When enabled and IPv6 is available, the integration updates AAAA records using `ip6` in the updater call.
-    - **Update Interval**: Set the polling interval (0–120 minutes; default: 23 minutes). Set to 0 to disable automatic updates.
+   - **Economy Mode**: Enable to update the IP only when it changes (checked via public IPv4/IPv6 IP-check services), saving API tokens.
+   - **IPv6 Support**: Enable or disable IPv6 update support. When enabled and IPv6 is available, the integration updates AAAA records using `ip6` in the updater call.
+   - **Update Interval**: Set the polling interval (0–120 minutes; default: 23 minutes). Set to 0 to disable automatic updates.
 6. Submit the configuration. The integration will appear as a card on the **Devices & Services** page.
 
 ---
