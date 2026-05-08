@@ -7,7 +7,7 @@ from typing import Any
 
 from homeassistant.components.sensor import RestoreSensor, SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DOMAIN, CONF_IP_ADDRESS
+from homeassistant.const import CONF_DOMAIN, CONF_IP_ADDRESS, CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -171,19 +171,36 @@ class IPv64DomainSensor(IPv64BaseEntity, SensorEntity):
 
     _attr_icon = "mdi:ip"
 
-    def __init__(self, coordinator: IPv64DataUpdateCoordinator, domain: str) -> None:
+    def __init__(
+        self,
+        coordinator: IPv64DataUpdateCoordinator,
+        domain: str,
+        record_type: str | None = None,
+    ) -> None:
         """Initialize the IPv64 domain sensor."""
         super().__init__(coordinator, domain)
         self._domain = domain
-        self._attr_name = f"{SHORT_NAME} {domain} IP"
-        self._attr_unique_id = f"{DOMAIN}_{domain}_ip"
+        self._record_type = record_type
+
+        if record_type == "A":
+            self._attr_name = f"{SHORT_NAME} {domain} IPv4"
+            self._attr_unique_id = f"{DOMAIN}_{domain}_ipv4"
+        elif record_type == "AAAA":
+            self._attr_name = f"{SHORT_NAME} {domain} IPv6"
+            self._attr_unique_id = f"{DOMAIN}_{domain}_ipv6"
+        else:
+            self._attr_name = f"{SHORT_NAME} {domain} IP"
+            self._attr_unique_id = f"{DOMAIN}_{domain}_ip"
 
     @property
     def native_value(self) -> StateType:
         """Return the native value of the sensor."""
         for subdomain in self.coordinator.data.get("subdomains", []):
-            if subdomain.get(CONF_DOMAIN) == self._domain:
-                return subdomain.get(CONF_IP_ADDRESS, "unknown")
+            if subdomain.get(CONF_DOMAIN) != self._domain:
+                continue
+            if self._record_type and subdomain.get(CONF_TYPE) != self._record_type:
+                continue
+            return subdomain.get(CONF_IP_ADDRESS, "unknown")
         return "unknown"
 
     @property
@@ -193,13 +210,16 @@ class IPv64DomainSensor(IPv64BaseEntity, SensorEntity):
         if not self.coordinator.data:
             return data
         for subdomain in self.coordinator.data.get("subdomains", []):
-            if subdomain.get(CONF_DOMAIN) == self._domain:
-                subdomain_data = {k: v for k, v in subdomain.items() if k != "subdomains"}
-                main_domain = self._domain.split(".", 1)[1] if "." in self._domain else self._domain
-                metadata = self.coordinator.data.get(f"{main_domain}_metadata", {})
-                if metadata.get("wildcard"):
-                    subdomain_data["wildcard"] = metadata["wildcard"]
-                return {**data, **subdomain_data}
+            if subdomain.get(CONF_DOMAIN) != self._domain:
+                continue
+            if self._record_type and subdomain.get(CONF_TYPE) != self._record_type:
+                continue
+            subdomain_data = {k: v for k, v in subdomain.items() if k != "subdomains"}
+            main_domain = self._domain.split(".", 1)[1] if "." in self._domain else self._domain
+            metadata = self.coordinator.data.get(f"{main_domain}_metadata", {})
+            if metadata.get("wildcard"):
+                subdomain_data["wildcard"] = metadata["wildcard"]
+            return {**data, **subdomain_data}
         return data
 
 
@@ -242,9 +262,25 @@ async def async_setup_entry(
     if not coordinator.data.get("subdomains"):
         _LOGGER.warning("No subdomains available for %s, skipping domain sensors", config_entry.entry_id)
     else:
-        entities.extend(
-            [IPv64DomainSensor(coordinator, subdomain[CONF_DOMAIN]) for subdomain in coordinator.data["subdomains"]]
-        )
+        domain_types: dict[str, set[str]] = {}
+        for subdomain in coordinator.data["subdomains"]:
+            domain = subdomain.get(CONF_DOMAIN)
+            record_type = subdomain.get(CONF_TYPE)
+            if not domain:
+                continue
+            if domain not in domain_types:
+                domain_types[domain] = set()
+            if record_type:
+                domain_types[domain].add(record_type)
+
+        for domain, record_types in domain_types.items():
+            if "A" in record_types:
+                entities.append(IPv64DomainSensor(coordinator, domain, "A"))
+            if "AAAA" in record_types:
+                entities.append(IPv64DomainSensor(coordinator, domain, "AAAA"))
+            if not record_types:
+                entities.append(IPv64DomainSensor(coordinator, domain))
+
         entities.append(IPv64LastUpdateSensor(coordinator))
 
     if coordinator.data.get(CONF_DYNDNS_UPDATES) is not None:

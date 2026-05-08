@@ -359,10 +359,19 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
 
         if ip_is_changed:
             headers_token = {"Authorization": f"Bearer {self.config_entry.data.get(CONF_TOKEN, '')}"}
+            update_params: dict[str, str] = {"domain": self.config_entry.data.get(CONF_DOMAIN, "")}
+            ip_v4 = self.data.get("ip_v4")
+            ip_v6 = self.data.get("ip_v6")
+            if isinstance(ip_v4, str) and ip_v4 and ip_v4 != "unknown":
+                update_params["ip"] = ip_v4
+            if isinstance(ip_v6, str) and ip_v6 and ip_v6 != "unknown":
+                update_params["ip6"] = ip_v6
+
             for attempt in range(RETRY_ATTEMPTS):
                 try:
                     async with session.get(
-                        f"{UPDATE_URL}?domain={self.config_entry.data.get(CONF_DOMAIN, '')}",
+                        UPDATE_URL,
+                        params=update_params,
                         headers=headers_token,
                         timeout=TIMEOUT,
                     ) as resp:
@@ -466,24 +475,22 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
         """Check if the IP has changed (both IPv4 and IPv6)."""
         _LOGGER.debug("Checking IP in economy mode for %s", self.config_entry.data.get(CONF_DOMAIN))
         config_domain = self.config_entry.data.get(CONF_DOMAIN)
-        
+
         stored_v4 = self.data.get("ip_v4", "unknown")
         stored_v6 = self.data.get("ip_v6", "unknown")
 
-        if stored_v4 == "unknown" and stored_v6 == "unknown":
-            _LOGGER.warning("No stored IPv4 or IPv6 found for domain %s, triggering update", config_domain)
-            return True
-
         ip_changed = False
+        has_current_ip = False
 
         # Check IPv4
         try:
             async with session.get(CHECKIP_V4_URL, timeout=TIMEOUT) as resp:
                 resp.raise_for_status()
                 current_v4 = (await resp.text()).strip()
+                has_current_ip = True
+                self.data["ip_v4"] = current_v4
                 if current_v4 != stored_v4:
                     _LOGGER.debug("IPv4 changed for %s: %s -> %s", config_domain, stored_v4, current_v4)
-                    self.data["ip_v4"] = current_v4
                     ip_changed = True
             async_dismiss(self.hass, notification_id=f"{DOMAIN}_{self.config_entry.entry_id}_ip_check_error")
         except (aiohttp.ClientError, TimeoutError) as err:
@@ -494,11 +501,16 @@ class IPv64DataUpdateCoordinator(DataUpdateCoordinator):
             async with session.get(CHECKIP_V6_URL, timeout=TIMEOUT) as resp:
                 resp.raise_for_status()
                 current_v6 = (await resp.text()).strip()
+                has_current_ip = True
+                self.data["ip_v6"] = current_v6
                 if current_v6 != stored_v6:
                     _LOGGER.debug("IPv6 changed for %s: %s -> %s", config_domain, stored_v6, current_v6)
-                    self.data["ip_v6"] = current_v6
                     ip_changed = True
         except (aiohttp.ClientError, TimeoutError) as err:
             _LOGGER.debug("IPv6 check not available or failed for %s: %s", config_domain, err)
+
+        if not has_current_ip and stored_v4 == "unknown" and stored_v6 == "unknown":
+            _LOGGER.warning("No stored or detected public IP for %s, triggering update", config_domain)
+            return True
 
         return ip_changed
