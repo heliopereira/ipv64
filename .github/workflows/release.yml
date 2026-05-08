@@ -2,10 +2,6 @@ name: Release Version
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    # paths-ignore:
-    #   - ".github/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref_name || github.ref }}
@@ -32,66 +28,41 @@ jobs:
         with:
           ref: main
 
-      - name: Set up Python 3
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
-        with:
-          python-version: |
-            3.13
-
-      - name: Get Version
+      - name: Calculate next semantic version tag
         id: version
-        shell: bash
         run: |
-          echo "version=$(python3 ./.github/actions/get_version.py)" >> $GITHUB_OUTPUT
-
-      - name: Is Tag exists
-        id: checkTag
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
-        with:
-          script: |
-            try {
-              await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag: `${{ steps.version.outputs.version }}`
-              });
-              core.setOutput("exists","true");
-            } catch (e) {
-              // 404 = Release nicht gefunden, alles andere weiterwerfen
-              core.setOutput("exists", e.status === 404 ? "false" : "error");
-            }
-
-      - if: steps.checkTag.outputs.exists == 'false'
-        name: Check Tag
-        id: check-tag
-        run: |
-          if [[ "${{ steps.version.outputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "match=true" >> $GITHUB_OUTPUT
+          git fetch --tags
+          latest_tag=$(git tag --list --sort=-version:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
+          if [[ -z "$latest_tag" ]]; then
+            next_tag="1.0.0"
+          else
+            IFS='.' read -r major minor patch <<< "$latest_tag"
+            next_tag="$major.$minor.$((patch + 1))"
           fi
+          echo "latest_tag=${latest_tag:-none}" >> $GITHUB_OUTPUT
+          echo "next_tag=$next_tag" >> $GITHUB_OUTPUT
+          echo "Release tag: $next_tag"
 
       - name: ZIP Component Dir
-        if: steps.checkTag.outputs.exists == 'false'
         run: |
           cd ${{ github.workspace }}/custom_components/ipv64
           zip -r ipv64.zip ./
 
       - name: Create Release
-        if: steps.checkTag.outputs.exists == 'false'
         uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.version.outputs.next_tag }}
+          name: v${{ steps.version.outputs.next_tag }}
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           generate_release_notes: true
 
       - name: Upload zip to release
-        if: steps.checkTag.outputs.exists == 'false'
         uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/custom_components/ipv64/ipv64.zip
           asset_name: ipv64.zip
-          tag: ${{ steps.version.outputs.version }}
+          tag: ${{ steps.version.outputs.next_tag }}
           overwrite: true
